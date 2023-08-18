@@ -15,13 +15,26 @@ const getAllArticle = async (req, res) => {
   }
 };
 
+const getOneArticle = async (req, res) => {
+  try {
+    const client = await mongoClient.connect();
+    const board = client.db("board").collection("articles");
+
+    const oneArticle = board.findOne({ article_id: req.params.id });
+    if (oneArticle) res.status(200).json(oneArticle);
+  } catch (err) {
+    res.status(400).json("글을 찾을 수 없습니다.");
+    console.error(err);
+  }
+};
+
 const createArticle = async (req, res) => {
   try {
     const client = await mongoClient.connect();
     const board = client.db("board").collection("articles");
 
     const addArticle = await board.insertOne({
-      article_id: req.body.article_id,
+      article_id: req.params.id,
       title: req.body.title,
       author: req.session.userID,
       content: req.body.content,
@@ -45,4 +58,4 @@ const modifyArticle = async (req, res) => {
   }
 };
 
-module.exports = { getAllArticle, createArticle };
+module.exports = { getAllArticle, getOneArticle, createArticle };
