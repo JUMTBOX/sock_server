@@ -5,7 +5,7 @@ const getAllArticle = async (req, res) => {
   try {
     const client = await mongoClient.connect();
     const board = client.db("board").collection("articles");
-
+    board.createIndex({ article_id: 1 });
     const allArticles = board.find({});
     const allData = await allArticles.toArray();
     if (allArticles) res.status(200).json(allData);
@@ -34,9 +34,9 @@ const createArticle = async (req, res) => {
     const board = client.db("board").collection("articles");
 
     const addArticle = await board.insertOne({
-      article_id: req.params.id,
+      article_id: req.body.id,
       title: req.body.title,
-      author: req.session.userID,
+      author: req.body.author,
       content: req.body.content,
     });
     if (addArticle) res.status(200).json("포스팅 성공!");
