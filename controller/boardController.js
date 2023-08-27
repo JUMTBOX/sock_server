@@ -21,7 +21,6 @@ const getOneArticle = async (req, res) => {
     const oneArticle = await board.findOne({
       article_id: Number(req.params.id),
     });
-    console.log(oneArticle);
     if (oneArticle) res.status(200).json(oneArticle);
   } catch (err) {
     res.status(400).json("글을 찾을 수 없습니다.");
