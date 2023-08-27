@@ -5,7 +5,6 @@ const getAllArticle = async (req, res) => {
   try {
     const client = await mongoClient.connect();
     const board = client.db("board").collection("articles");
-    board.createIndex({ article_id: 1 });
     const allArticles = board.find({});
     const allData = await allArticles.toArray();
     if (allArticles) res.status(200).json(allData);
@@ -19,8 +18,10 @@ const getOneArticle = async (req, res) => {
   try {
     const client = await mongoClient.connect();
     const board = client.db("board").collection("articles");
-
-    const oneArticle = board.findOne({ article_id: req.params.id });
+    const oneArticle = await board.findOne({
+      article_id: Number(req.params.id),
+    });
+    console.log(oneArticle);
     if (oneArticle) res.status(200).json(oneArticle);
   } catch (err) {
     res.status(400).json("글을 찾을 수 없습니다.");
@@ -32,12 +33,14 @@ const createArticle = async (req, res) => {
   try {
     const client = await mongoClient.connect();
     const board = client.db("board").collection("articles");
-
+    //전체 데이터 개수 세기
+    const numOfArticle = await board.countDocuments({});
     const addArticle = await board.insertOne({
-      article_id: req.body.id,
+      article_id: numOfArticle + 1,
       title: req.body.title,
       author: req.body.author,
       content: req.body.content,
+      created: new Date(),
     });
     if (addArticle) res.status(200).json("포스팅 성공!");
   } catch (err) {
