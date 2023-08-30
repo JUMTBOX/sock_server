@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 const mongoClient = require("./mongoConnect");
 
 const getAllArticle = async (req, res) => {
@@ -52,12 +51,43 @@ const modifyArticle = async (req, res) => {
   try {
     const client = await mongoClient.connect();
     const board = client.db("board").collection("articles");
-    const getModifiedOne = board.findOne({
-      article_id: ObjectId(req.params.id),
-    });
+    const modify = await board.updateOne(
+      {
+        article_id: Number(req.params.id),
+      },
+      {
+        $set: {
+          title: req.body.title,
+          author: req.body.author,
+          content: req.body.content,
+        },
+      }
+    );
+    if (modify) res.status(200).json("수정 완료!");
   } catch (err) {
     console.error(err);
   }
 };
 
-module.exports = { getAllArticle, getOneArticle, createArticle };
+const deleteArticle = async (req, res) => {
+  try {
+    const client = await mongoClient.connect();
+    const board = client.db("board").collection("articles");
+
+    console.log(req.params.id);
+    const deleteOne = await board.deleteOne({
+      article_id: Number(req.params.id),
+    });
+    if (deleteOne) res.status(200).json("삭제완료");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+module.exports = {
+  getAllArticle,
+  getOneArticle,
+  createArticle,
+  modifyArticle,
+  deleteArticle,
+};
