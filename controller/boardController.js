@@ -63,7 +63,7 @@ const modifyArticle = async (req, res) => {
         },
       }
     );
-    if (modify) res.status(200).json("수정 완료!");
+    if (modify) res.status(200);
   } catch (err) {
     console.error(err);
   }
